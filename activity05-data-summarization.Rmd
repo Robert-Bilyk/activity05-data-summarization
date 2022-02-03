@@ -25,8 +25,7 @@ We read in the same data from Activity 4 below, but notice that this code is now
 Compare this code output to the `load_data` chunk in your knitted Activity 4 `.md` report.
 What does enclosing an assignment code (i.e., `object_name <- r_code`) in parentheses do?
 
-**Response**:
-
+It actually loads and displays the first 10 observations in the dataset.
 
 ### Data Codebook
 
@@ -79,6 +78,12 @@ There are a number of ways to create a code chunk:
 Below, create a code chunk and name it `median_earnings`.
 Make sure there is an empty line above and below the code chunk.
 
+```{r median_earnings, message=FALSE}
+
+college_recent_grads %>%
+summarise(median_all_majors = median(median))
+  
+```
 
 
 In your newly created R code chunk, verify that the median income for all majors was $36,000.
@@ -95,12 +100,18 @@ Be careful when you name your output summaries as we are dealing with things tha
 When I and obtaining numerical summaries for variables, I like to include the variable name in my summary name (e.g., `mean_med_earnings = mean(median)`).
 Create a code chunk and name it `summary_earnings`.
 
+```{r summary_earnings, message=FALSE}
+
+college_recent_grads %>%
+  summarise(mean=mean(median), stddev=sd(median), minimum=min(median), median=median(median),maximum=max(median))
+
+```
 
 
 Provide a discussion on what you believe the distribution of median earnings will look like.
 You should discuss the center, spread, and potential shape only using these values - I do NOT want to see any data visualizations here.
 
-**Response**:
+The data appears to be somewhat right skewed with a sizable standard deviation.
 
 
 ### Median Earnings by Major Category
@@ -110,12 +121,21 @@ Using the `college_recent_grads` dataset and functions from `{dplyr}`, obtain si
 *Arrange* this summary table by the median earning.
 Create a code chunk and name it `major_earnings`.
 
+```{r major_earnings, message=FALSE}
+
+college_recent_grads %>%
+  group_by(major_category) %>%
+  summarise(mean=mean(median), stddev=sd(median), minimum=min(median), median=median(median),maximum=max(median)) %>%
+  arrange(median) %>%
+  knitr::kable()
+
+```
 
 
 Provide a discussion on how each major compares to the overall distribution.
 You should discuss the center, spread, and potential shape only using these summary values - I do NOT want to see any data visualizations here.
 
-**Response**:
+It appeasr that in general STEM categories and business have the largest salaries overall while social sciences and social work appear to be lower on the list. Although it is important to note that there is decent spread on most of the majors salaries.
 
 
 Before we continue, add the following to the end of your pipeline (you will need to pipe first) in your `major_earnings` code chunk:
@@ -128,8 +148,7 @@ Knit your document with and without this last piped code.
 What changes about the output?
 When would this `knitr::kable` code be useful?
 
-**Response**:
-
+It put the data althogether on a single paged table. This would be helpful when getting a final table for the data as it no longer needs to be changed.
 
 ![](README-img/noun_pause.png) **Planned Pause Point**: If you have any questions, contact your instructor. Otherwise feel free to continue on.
 
@@ -139,12 +158,18 @@ Let us see how well your descriptions in the [Median Earnings by Major Category]
 Plot the distribution of the variable `median` earnings of full-time, year-round workers for each `major_category` using the *boxplot* and *jitter* geometries.
 Create a code chunk and name it `major_boxplot`.
 
+```{r major_boxplot, message=FALSE}
+
+college_recent_grads %>%
+  ggplot(mapping=aes(x=major_category,y=median)) +
+  geom_boxplot() + geom_jitter()
+  
+```
 
 
 Provide a discussion on how your descriptions in the Median Earnings by Major Category section compares.
 
-**Response**:
-
+My descriptions appeared to fit pretty well with what the graphs show
 
 <img src="README-img/noun_pause.png" alt="pause" width = "20"/> <b>Planned Pause Point</b>: If you feel that you have a good understanding of these commands, feel free to start working on your project. The remainder of this activity will help to expand these commands.
 
@@ -162,12 +187,20 @@ In this code chunk,
 3. Assign/create a *rank* for each summarized value (rank for `total`, rank for `sharewomen`, etc.) and provide a meaningful name to each ranked column value.
 4. Arrange the results so that `major_category` appear in alphabetical order ("A" at the top).
 
+```{r major_category, message=FALSE}
+
+college_recent_grads %>%
+  group_by(major_category) %>%
+  summarise(total=length(major), percentwomen=median(sharewomen),unemployed=median(unemployment_rate),median=median(median)) %>%
+  mutate(numrank=min_rank(total),sharewomenrank=min_rank(percentwomen),unemployedrank=min_rank(unemployed)) %>%
+  arrange(major_category)
+  
+```
 
 
 Provide a discussion on how the `major_category` rankings compare.
 
-**Response**:
-
+Women tend to be in jobs that have lower wages and higher unemployment overall than men do.
 
 ![](README-img/noun_pause.png) **(Final) Planned Pause Point**: If you have any questions, contact your instructor. Otherwise feel free to continue on.
 
